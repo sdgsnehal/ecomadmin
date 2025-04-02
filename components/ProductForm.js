@@ -27,12 +27,16 @@ const ProductForm = ({
   if (goToProduct) {
     router.push("/products");
   }
-  function uploadImages(e) {
+  async function uploadImages(e) {
     const files = e.target?.files;
     if (files.length > 0) {
       const data = new FormData();
-      files.forEach((file) => data.append("file", file));
-      
+      for (const file of files) {
+        data.append("file", file);
+      }
+
+      const res = await axios.post("/api/upload", data);
+      console.log(res.data);
     }
   }
   return (
