@@ -3,7 +3,10 @@ export default async function handler(req, res) {
   const form = new multiparty.Form();
   const { fields, files } = await new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
-      console.log(files.length);
+      if (err) {
+        reject(err);
+      }
+      resolve({ fields, files });
       res.json("ok");
     });
   });
