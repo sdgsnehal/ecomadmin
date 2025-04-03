@@ -7,11 +7,12 @@ const ProductForm = ({
   title: existingTitle,
   description: existingDescription,
   price: existingPrice,
-  images,
+  images: existingImages,
 }) => {
   const [title, setTitle] = useState(existingTitle || "");
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
+  const [images, setImages] = useState(existingImages || []);
   const [goToProduct, setGoToProduct] = useState(false);
   const router = useRouter();
   const saveProduct = async (e) => {
@@ -34,11 +35,10 @@ const ProductForm = ({
       for (const file of files) {
         data.append("file", file);
       }
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
+      const res = await axios.post("/api/upload", data);
+      setImages(() => {
+        return [...images, ...res.data.links];
       });
-      console.log(res);
     }
   }
   return (
@@ -52,6 +52,7 @@ const ProductForm = ({
       />
       <label>Product Image</label>
       <div className="mb-2">
+        {!!images?.length && images.map((link) => <div key={link}>{link}</div>)}
         <label className="w-24 h-24 cursor-pointer text-center flex items-center justify-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
