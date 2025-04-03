@@ -1,6 +1,9 @@
 import axios from "axios";
+import { set } from "mongoose";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import Spinner from "./spinner";
 
 const ProductForm = ({
   _id,
@@ -14,10 +17,11 @@ const ProductForm = ({
   const [price, setPrice] = useState(existingPrice || "");
   const [images, setImages] = useState(existingImages || []);
   const [goToProduct, setGoToProduct] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
   const saveProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price };
+    const data = { title, description, price, images };
     if (_id) {
       await axios.put("/api/products", { ...data, _id });
     } else {
@@ -31,6 +35,7 @@ const ProductForm = ({
   async function uploadImages(e) {
     const files = e.target?.files;
     if (files.length > 0) {
+      setIsUploading(true);
       const data = new FormData();
       for (const file of files) {
         data.append("file", file);
@@ -39,6 +44,7 @@ const ProductForm = ({
       setImages(() => {
         return [...images, ...res.data.links];
       });
+      setIsUploading(false);
     }
   }
   return (
@@ -51,9 +57,19 @@ const ProductForm = ({
         onChange={(e) => setTitle(e.target.value)}
       />
       <label>Product Image</label>
-      <div className="mb-2">
-        {!!images?.length && images.map((link) => <div key={link}>{link}</div>)}
-        <label className="w-24 h-24 cursor-pointer text-center flex items-center justify-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-300">
+      <div className="mb-2 flex flex-wrap gap-1">
+        {!!images?.length &&
+          images.map((link) => (
+            <div key={link} className="inline-block h-24">
+              <Image src={link} alt="product image" className="rounded-lg" />
+            </div>
+          ))}
+        {isUploading && (
+          <div className="h-24 bg-gray-200 p-1 flex items-center">
+            <Spinner />
+          </div>
+        )}
+        <label className=" w-24 h-24 cursor-pointer text-center flex items-center justify-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -71,7 +87,6 @@ const ProductForm = ({
           <div>Upload</div>
           <input type="file" className="hidden" onChange={uploadImages} />
         </label>
-        {!images?.length && <div>No Photos in this product</div>}
       </div>
 
       <label>Description</label>
