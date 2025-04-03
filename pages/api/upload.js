@@ -1,4 +1,5 @@
 import multiparty from "multiparty";
+import s3 from "aws-sdk/clients/s3";
 export default async function handler(req, res) {
   const form = new multiparty.Form();
   const { fields, files } = await new Promise((resolve, reject) => {
