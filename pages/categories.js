@@ -4,25 +4,26 @@ import { useEffect, useState } from "react";
 
 const Categories = () => {
   const [name, setName] = useState("");
+  const [parentCategory, setParentCategory] = useState("");
   const [categories, setCategories] = useState([]);
   useEffect(() => {
-    fetchCategories()
+    fetchCategories();
   }, []);
   function fetchCategories() {
     axios.get("/api/categories").then((response) => {
-        setCategories(response.data);
-      });
+      setCategories(response.data);
+    });
   }
   async function saveCategory(e) {
     e.preventDefault();
     await axios.post("/api/categories", { name });
     setName("");
-    fetchCategories()
+    fetchCategories();
   }
   return (
     <Layout>
       <h1>Categories</h1>
-      <label> NewCategory Name</label>
+      <label> New Category Name</label>
       <form onSubmit={saveCategory} className="flex gap-1">
         <input
           className="!mb-0"
@@ -31,6 +32,17 @@ const Categories = () => {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+        <select
+          className="!mb-0"
+          value={parentCategory}
+          onChange={(e) => setParentCategory(e.target.value)}
+        >
+          <option value="0">No Parent Category</option>
+          {categories.length > 0 &&
+            categories.map((category) => (
+              <option key={category._id}>{category.name}</option>
+            ))}
+        </select>
         <button type="submit" className="btn-primary">
           Save
         </button>
