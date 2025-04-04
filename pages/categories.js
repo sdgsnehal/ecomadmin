@@ -16,7 +16,7 @@ const Categories = () => {
   }
   async function saveCategory(e) {
     e.preventDefault();
-    await axios.post("/api/categories", { name });
+    await axios.post("/api/categories", { name, parentCategory });
     setName("");
     fetchCategories();
   }
@@ -40,7 +40,9 @@ const Categories = () => {
           <option value="0">No Parent Category</option>
           {categories.length > 0 &&
             categories.map((category) => (
-              <option key={category._id}>{category.name}</option>
+              <option key={category._id} value={category._id}>
+                {category.name}
+              </option>
             ))}
         </select>
         <button type="submit" className="btn-primary">
@@ -51,6 +53,7 @@ const Categories = () => {
         <thead>
           <tr>
             <td>Category</td>
+            <td>Parent Category</td>
           </tr>
         </thead>
         <tbody>
@@ -58,6 +61,7 @@ const Categories = () => {
             categories.map((category) => (
               <tr key={category._id}>
                 <td>{category.name}</td>
+                <td>{category?.parent?.name}</td>
               </tr>
             ))}
         </tbody>
