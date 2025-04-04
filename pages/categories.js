@@ -54,6 +54,7 @@ const Categories = () => {
           <tr>
             <td>Category</td>
             <td>Parent Category</td>
+            <td></td>
           </tr>
         </thead>
         <tbody>
@@ -62,6 +63,10 @@ const Categories = () => {
               <tr key={category._id}>
                 <td>{category.name}</td>
                 <td>{category?.parent?.name}</td>
+                <td>
+                  <button className="btn-primary mr-1">Edit</button>
+                  <button className="btn-primary">Delete</button>
+                </td>
               </tr>
             ))}
         </tbody>
