@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-input,textarea{
+input,textarea ,select{
     @apply border border-gray-200 rounded-md p-2 w-full;
     @apply mb-2;
 }
-input:focus,textarea:focus{
+input:focus,textarea:focus ,select:focus{
   @apply  border-blue-900;
 }
 h1{
