@@ -1,11 +1,15 @@
 import Layout from "@/components/layout";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const Categories = () => {
+  const [editedCategory, setEditedCategory] = useState(null);
   const [name, setName] = useState("");
   const [parentCategory, setParentCategory] = useState("");
   const [categories, setCategories] = useState([]);
+  const [inputValue, setInputValue] = useState("");
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -16,14 +20,56 @@ const Categories = () => {
   }
   async function saveCategory(e) {
     e.preventDefault();
-    await axios.post("/api/categories", { name, parentCategory });
+    const data = { name, parentCategory };
+    if (editedCategory) {
+      axios.put("/api/categories", {
+        ...data,
+        _id: editedCategory._id,
+      });
+      setEditedCategory(null);
+    } else {
+      await axios.post("/api/categories", { data });
+    }
     setName("");
     fetchCategories();
   }
+  function editCategory(category) {
+    setEditedCategory(category);
+    setName(category.name);
+    setParentCategory(category.parent?._id || "");
+  }
+  const showSwal = async (category) => {
+    withReactContent(Swal)
+      .fire({
+        text: `Are you sure you want to delete ${category.name}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          const { _id } = category;
+          Swal.fire({
+            title: "Deleted!",
+            text: "Category has been deleted.",
+            icon: "success",
+          });
+          await axios.delete("/api/categories?_id=" + _id);
+          fetchCategories();
+        }
+      });
+  };
   return (
     <Layout>
       <h1>Categories</h1>
-      <label> New Category Name</label>
+      <label>
+        {editedCategory
+          ? `Edit category ${editedCategory.name}`
+          : "Create New Category"}
+      </label>
       <form onSubmit={saveCategory} className="flex gap-1">
         <input
           className="!mb-0"
@@ -64,8 +110,22 @@ const Categories = () => {
                 <td>{category.name}</td>
                 <td>{category?.parent?.name}</td>
                 <td>
-                  <button className="btn-primary mr-1">Edit</button>
-                  <button className="btn-primary">Delete</button>
+                  <button
+                    onClick={() => {
+                      editCategory(category);
+                    }}
+                    className="btn-primary mr-1"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      showSwal(category);
+                    }}
+                    className="btn-primary"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
