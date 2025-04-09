@@ -4,6 +4,8 @@ import fs from "fs";
 import mime from "mime-types";
 const bucketName = "your-bucket-name";
 export default async function handler(req, res) {
+  await mongooseConnect();
+  await isAdminRequest(req, res);
   const form = new multiparty.Form();
   const { fields, files } = await new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
   });
-  const links=[];
+  const links = [];
   for (const file of files.file) {
     const ext = file.originalFilename.split(".").pop();
     const newFileName = Date.now() + "." + ext;
