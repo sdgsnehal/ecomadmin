@@ -48,6 +48,12 @@ const Categories = () => {
     setEditedCategory(category);
     setName(category.name);
     setParentCategory(category.parent?._id || "");
+    setProperties(
+      category.properties.map(({ name, values }) => ({
+        name,
+        values: values.join(","),
+      }))
+    );
   }
   const showSwal = async (category) => {
     withReactContent(Swal)
@@ -179,6 +185,7 @@ const Categories = () => {
                 setEditedCategory(null);
                 setName("");
                 setParentCategory("");
+                setProperties([]);
               }}
               className="btn-default"
             >

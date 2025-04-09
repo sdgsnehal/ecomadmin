@@ -1,9 +1,13 @@
 import Product from "@/lib/models/product";
 import { mongooseConnect } from "@/lib/mongoose";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]";
 
 export default async function handler(req, res) {
   const { method } = req;
   await mongooseConnect();
+  const session = await getServerSession(req, res, authOptions);
+  console.log(session);
   if (method === "GET") {
     if (req?.query?.id) {
       res.json(await Product.findOne({ _id: req.query.id }));
@@ -12,21 +16,24 @@ export default async function handler(req, res) {
     }
   }
   if (method === "POST") {
-    const { title, description, price, images, category } = req.body;
+    const { title, description, price, images, category, properties } =
+      req.body;
     const productDoc = await Product.create({
       title,
       description,
       price,
       images,
       category,
+      properties,
     });
     res.json(productDoc);
   }
   if (method === "PUT") {
-    const { title, description, price, _id, images, category } = req.body;
+    const { title, description, price, _id, images, category, properties } =
+      req.body;
     await Product.updateOne(
       { _id },
-      { title, description, price, images, category }
+      { title, description, price, images, category, properties }
     );
     res.json(true);
   }

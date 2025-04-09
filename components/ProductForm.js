@@ -12,6 +12,7 @@ const ProductForm = ({
   price: existingPrice,
   images: existingImages,
   category: existingCategory,
+  properties: existingProperties,
 }) => {
   const [title, setTitle] = useState(existingTitle || "");
   const [description, setDescription] = useState(existingDescription || "");
@@ -21,6 +22,9 @@ const ProductForm = ({
   const [goToProduct, setGoToProduct] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [productProperties, setProductProperties] = useState(
+    existingProperties || {}
+  );
   const router = useRouter();
   useEffect(() => {
     axios.get("/api/categories").then((result) => {
@@ -29,7 +33,14 @@ const ProductForm = ({
   }, []);
   const saveProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price, images, category };
+    const data = {
+      title,
+      description,
+      price,
+      images,
+      category,
+      properties: productProperties,
+    };
     if (_id) {
       await axios.put("/api/products", { ...data, _id });
     } else {
@@ -55,6 +66,26 @@ const ProductForm = ({
       setIsUploading(false);
     }
   }
+  const propertiesToFill = [];
+  if (categories.length > 0 && category) {
+    let catInfo = categories.find(({ _id }) => _id === category);
+
+    propertiesToFill.push(...catInfo.properties);
+    while (catInfo?.parent?.id) {
+      const parentCat = categories.find(
+        ({ _id }) => _id === catInfo?.parent?.id
+      );
+      propertiesToFill.push(...parentCat.properties);
+      catInfo = parentCat;
+    }
+  }
+  function setProductProp(propName, value) {
+    setProductProperties((prev) => {
+      const newProductProps = { ...prev };
+      newProductProps[propName] = value;
+      return newProductProps;
+    });
+  }
   return (
     <form onSubmit={saveProduct}>
       <label>Product Name</label>
@@ -78,6 +109,22 @@ const ProductForm = ({
             </option>
           ))}
       </select>
+      {propertiesToFill.length > 0 &&
+        propertiesToFill.map((p, index) => (
+          <div key={index} className="flex gap-1">
+            <div>{p.name}</div>
+            <select
+              onChange={(e) => setProductProp(p.name, e.target.value)}
+              value={productProperties[p.name]}
+            >
+              {p.values.map((v, index) => (
+                <option value={v} key={index}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
+        ))}
       <label>Product Image</label>
       <div className="mb-2 flex flex-wrap gap-1">
         {!!images?.length &&
