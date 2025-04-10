@@ -14,7 +14,7 @@ const Products = () => {
     <Layout>
       <Link
         href={"/products/new"}
-        className="bg-blue-900 text-black py-2 px-2 rounded-md"
+        className="btn-primary"
       >
         {" "}
         Add new products
