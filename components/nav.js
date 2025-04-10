@@ -1,31 +1,28 @@
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Logo from "./logo";
 
-const Nav = () => {
+const Nav = ({ show }) => {
   const inactiveLink = "flex gap-1 ";
-  const activeLink = inactiveLink + "bg-white text-blue-900 p-1 rounded-l-lg";
+  const activeLink = inactiveLink + "bg-blue-200 text-blue-900 p-1 rounded-sm";
   const router = useRouter();
   const { pathname } = router;
+  async function logout() {
+    await router.push("/");
+    await signOut();
+  }
+  console.log(show);
   return (
-    <aside className="text-white p-4 pr-0">
-      <Link href={"/"} className="flex gap-1 mb-4 mr-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"
-          />
-        </svg>
-        <span className="">Ecommerce Admin</span>
-      </Link>
+    <aside
+      className={`top-0 text-gray-500 p-4 fixed w-full bg-gray-200 h-full transition-all duration-300 md:static md:w-auto ${
+        show ? "left-0" : "-left-full"
+      }`}
+    >
+      <div className="mb-4 mr-4">
+        <Logo />
+      </div>
+
       <nav className="flex flex-col gap-2">
         <Link
           href={"/"}
@@ -129,7 +126,7 @@ const Nav = () => {
           </svg>
           Settings
         </Link>
-        <button onClick={()=>signOut()} className={inactiveLink}>
+        <button onClick={logout} className={inactiveLink}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
