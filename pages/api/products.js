@@ -1,13 +1,12 @@
 import Product from "@/lib/models/product";
 import { mongooseConnect } from "@/lib/mongoose";
-import { getServerSession } from "next-auth";
-import { authOptions, isAdminRequest } from "./auth/[...nextauth]";
+import {  isAdminRequest } from "./auth/[...nextauth]";
 
 export default async function handler(req, res) {
   const { method } = req;
   await mongooseConnect();
   await isAdminRequest(req, res);
-
+  
   if (method === "GET") {
     if (req?.query?.id) {
       res.json(await Product.findOne({ _id: req.query.id }));
