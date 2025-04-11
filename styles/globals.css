@@ -1,40 +1,40 @@
 @import "tailwindcss";
 
 input,textarea ,select{
-    @apply border border-gray-200 rounded-md p-2 w-full;
+    @apply border border-gray-200 rounded-sm py-2 px-3 w-full;
     @apply mb-2;
 }
 input:focus,textarea:focus ,select:focus{
   @apply  border-blue-900;
 }
 h1{
-  @apply text-blue-900 text-xl
+  @apply text-gray-600 text-xl mb-4;
 }
 label{
-  @apply text-blue-900;
+  @apply text-gray-600 text-sm;
 }
 .btn-primary{
-  @apply bg-blue-900 text-white px-4 py-1 rounded-md;
+  @apply bg-blue-900 text-white px-4 py-1 rounded-sm shadow-sm;
 }
 table.basic{
-  @apply w-full;
+  @apply w-full bg-white rounded-sm shadow-md;
 }
 table.basic thead tr td{
-  @apply bg-blue-200;
+  @apply text-sm text-gray-600 uppercase border-b border-gray-200 px-4 py-2;
 }
 table.basic tr td{
-  @apply border border-gray-300 p-1 
+  @apply  px-4 py-1 ;
 }
 table.basic a{
-  @apply bg-blue-900 text-white text-sm py-1 px-2 rounded-md inline-flex gap-1 mr-1
+  @apply  text-sm py-1 px-4 rounded-sm inline-flex gap-1 mr-1
 }
 .btn-default,.btn-red{
   @apply px-4 py-1 rounded-md;
 }
 .btn-red{
- @apply bg-red-800 text-white
+ @apply bg-red-300 text-red-600 px-4 py-1 rounded-sm shadow-sm;
 }
 .btn-default{
-  @apply bg-gray-500 text-white
+  @apply bg-white shadow-sm text-gray-800  px-4 py-1 rounded-sm border border-gray-200;
 
 }

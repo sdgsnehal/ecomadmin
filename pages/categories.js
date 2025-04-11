@@ -170,7 +170,7 @@ const Categories = () => {
                   onClick={() => {
                     removeProperty(index);
                   }}
-                  className="btn-default"
+                  className="btn-red"
                 >
                   Remove
                 </button>
@@ -217,7 +217,7 @@ const Categories = () => {
                       onClick={() => {
                         editCategory(category);
                       }}
-                      className="btn-primary mr-1"
+                      className="btn-default mr-1"
                     >
                       Edit
                     </button>
@@ -225,7 +225,7 @@ const Categories = () => {
                       onClick={() => {
                         showSwal(category);
                       }}
-                      className="btn-primary"
+                      className="btn-red"
                     >
                       Delete
                     </button>
