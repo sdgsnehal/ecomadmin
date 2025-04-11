@@ -14,7 +14,7 @@ label{
   @apply text-gray-600 text-sm;
 }
 .btn-primary{
-  @apply bg-blue-900 text-white px-4 py-1 rounded-sm;
+  @apply bg-blue-900 text-white px-4 py-1 rounded-sm shadow-sm;
 }
 table.basic{
   @apply w-full bg-white rounded-sm shadow-md;
@@ -26,15 +26,15 @@ table.basic tr td{
   @apply  px-4 py-1 ;
 }
 table.basic a{
-  @apply bg-gray-700 text-white text-sm py-1 px-4 rounded-sm inline-flex gap-1 mr-1
+  @apply  text-sm py-1 px-4 rounded-sm inline-flex gap-1 mr-1
 }
 .btn-default,.btn-red{
   @apply px-4 py-1 rounded-md;
 }
 .btn-red{
- @apply bg-red-800 text-white;
+ @apply bg-red-300 text-red-600 px-4 py-1 rounded-sm shadow-sm;
 }
 .btn-default{
-  @apply bg-gray-500 text-white;
+  @apply bg-white shadow-sm text-gray-800  px-4 py-1 rounded-sm border border-gray-200;
 
 }
