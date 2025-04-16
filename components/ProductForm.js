@@ -25,6 +25,7 @@ const ProductForm = ({
   const [productProperties, setProductProperties] = useState(
     existingProperties || {}
   );
+
   const router = useRouter();
   useEffect(() => {
     axios.get("/api/categories").then((result) => {
@@ -114,8 +115,10 @@ const ProductForm = ({
           <div key={index}>
             <label>{p.name[0].toUpperCase() + p.name.substring(1)}</label>
             <div>
-              <select value={productProperties[p.name]}>
+              <select
+                value={productProperties[p.name]}
                 onChange={(e) => setProductProp(p.name, e.target.value)}
+              >
                 {p.values.map((v, index) => (
                   <option value={v} key={index}>
                     {v}
@@ -133,7 +136,13 @@ const ProductForm = ({
               key={link}
               className="inline-block h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200"
             >
-              <Image src={link} alt="product image" className="rounded-lg" />
+              <Image
+                src={link}
+                alt="product image"
+                className="rounded-lg"
+                // width={96}
+                // height={96}
+              />
             </div>
           ))}
         {isUploading && (
