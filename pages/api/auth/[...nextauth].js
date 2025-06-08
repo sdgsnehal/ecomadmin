@@ -10,6 +10,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
+  secret: process.env.NEXT_PUBLIC_SECRET,
   adapter: MongoDBAdapter(client),
   callbacks: {
     session: async ({ session, token, user }) => {
@@ -26,8 +27,8 @@ export default NextAuth(authOptions);
 export async function isAdminRequest(req, res) {
   const session = await getServerSession(req, res, authOptions);
   if (!adminEmail.includes(session?.user?.email)) {
-    res.status(401)
-    res.end()
+    res.status(401);
+    res.end();
     throw new Error("Not authorized as admin");
   }
 }
