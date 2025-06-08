@@ -2,7 +2,7 @@ import NextAuth, { getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import client from "@/lib/db";
-const adminEmail = ["sdgsnehal@gmail.com"];
+const adminEmail = ["sdgsnehal@gmail.com", "ankitshanivare@gmail.com"];
 export const authOptions = {
   providers: [
     GoogleProvider({
