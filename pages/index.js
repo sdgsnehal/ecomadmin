@@ -7,19 +7,27 @@ const Home = () => {
 
   return (
     <Layout>
-      <div className="text-blue-900 flex justify-between">
-        <h2>
-          Hello,<b>{session?.user?.name}</b>
+      <div className="flex justify-between items-center rounded-xl px-6 py-3 sticky top-0 bg-white z-10">
+        {/* Greeting Section */}
+        <h2 className="text-lg font-medium text-gray-800">
+          Hello,{" "}
+          <span className="font-semibold text-blue-700">
+            {session?.user?.name}
+          </span>
         </h2>
-        <div className="flex bg-gray-300 text-black gap-1 overflow-hidden rounded-lg">
+
+        {/* Profile Section */}
+        <div className="flex items-center gap-3 bg-gray-100 hover:bg-gray-200 transition rounded-full px-3 py-1 cursor-pointer">
           <Image
             src={session?.user?.image}
             alt={session?.user?.name}
-            width={25}
-            height={25}
-            className="rounded-full"
+            width={36}
+            height={36}
+            className="rounded-full border border-gray-300"
           />
-          <span className="py-1 px-2">{session?.user?.name}</span>
+          <span className="text-sm font-medium text-gray-700">
+            {session?.user?.name}
+          </span>
         </div>
       </div>
     </Layout>

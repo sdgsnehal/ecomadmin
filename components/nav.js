@@ -15,9 +15,10 @@ const Nav = ({ show }) => {
   console.log(show);
   return (
     <aside
-      className={`top-0 text-gray-500 p-4 fixed w-full bg-gray-200 h-full transition-all duration-300 md:static md:w-auto ${
-        show ? "left-0" : "-left-full"
-      }`}
+      className={`text-gray-500 p-4 bg-white h-screen transition-all duration-300 
+       md:sticky md:top-0 md:w-64
+       ${show ? "fixed top-0 left-0 w-64" : "fixed top-0 -left-full w-64"} 
+       `}
     >
       <div className="mb-4 mr-4">
         <Logo />

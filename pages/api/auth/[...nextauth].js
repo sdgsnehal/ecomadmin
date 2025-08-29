@@ -12,13 +12,22 @@ export const authOptions = {
   ],
   secret: process.env.NEXT_PUBLIC_SECRET,
   adapter: MongoDBAdapter(client),
+  session: {
+    strategy: "jwt", // 👈 important
+  },
   callbacks: {
-    session: async ({ session, token, user }) => {
-      if (adminEmail.includes(session?.user?.email)) {
-        return session;
-      } else {
-        return false;
+    async jwt({ token, user }) {
+      if (adminEmail.includes(token?.email)) {
+        token.role = "admin"; // add role
       }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token?.role === "admin") {
+        session.user.role = "admin";
+        return session;
+      }
+      return false; // deny non-admins
     },
   },
 };
