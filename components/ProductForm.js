@@ -131,15 +131,28 @@ const ProductForm = ({ _id, initialData = {} }) => {
 
     setIsUploading(true);
     try {
-      const data = new FormData();
+      const formData = new FormData();
       for (const file of files) {
-        data.append("file", file);
+        formData.append("image", file);
       }
-      const res = await axios.post("/api/upload", data);
-      const newImages = [...watchedImages, ...res.data.links];
-      setValue("image", newImages);
+
+      const res = await fetchFromBackend("products/upload-images", {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("Upload response:", res);
+
+      // Backend returns { data: [{ url: "...", public_id: "..." }] }
+      const newImageUrls = res.data.map((item) => item.url);
+      const updatedImages = [...watchedImages, ...newImageUrls];
+      setValue("image", updatedImages);
+
+      // Clear the file input
+      e.target.value = "";
     } catch (error) {
       console.error("Error uploading images:", error);
+      alert("Failed to upload images. Please try again.");
     } finally {
       setIsUploading(false);
     }
@@ -204,29 +217,46 @@ const ProductForm = ({ _id, initialData = {} }) => {
   };
 
   const onSubmit = async (data) => {
+    console.log("Form submission started");
+    console.log("Submitting data:", data);
+
     setIsSubmitting(true);
     try {
-      const endpoint = _id ? `/api/products/${_id}` : "products/create";
+      const endpoint = _id ? `products/${_id}` : "products/create";
       const method = _id ? "PUT" : "POST";
 
-      await fetchFromBackend(endpoint, {
+      console.log("Endpoint:", endpoint);
+      console.log("Method:", method);
+
+      const response = await fetchFromBackend(endpoint, {
         method,
         body: JSON.stringify(data),
       });
 
+      console.log("Backend response:", response);
       router.push("/products");
     } catch (error) {
-      console.error("Error saving product:", error.message);
-      alert(error.message);
+      console.error("Error saving product:", error);
+      alert(error.message || "Failed to save product");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Add form validation check
+  const handleFormSubmit = (e) => {
+    console.log("Form submit triggered");
+    console.log("Form valid:", form.formState.isValid);
+    console.log("Form errors:", form.formState.errors);
+
+    // Let react-hook-form handle the submission
+    form.handleSubmit(onSubmit)(e);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleFormSubmit} className="space-y-8">
           {/* Basic Information */}
           <Card>
             <CardContent className="p-6">
@@ -238,7 +268,9 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Product Name</FormLabel>
+                      <FormLabel>
+                        Product Name <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Enter product name" {...field} />
                       </FormControl>
@@ -252,7 +284,9 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   name="sku"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SKU</FormLabel>
+                      <FormLabel>
+                        SKU <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Enter SKU" {...field} />
                       </FormControl>
@@ -303,14 +337,16 @@ const ProductForm = ({ _id, initialData = {} }) => {
           {/* Images */}
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Product Images</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Product Images <span className="text-red-500">*</span>
+              </h2>
 
               <div className="mb-4 flex flex-wrap gap-4">
-                {watchedImages.map((link, index) => (
-                  <div key={link} className="relative group">
+                {watchedImages.map((imageUrl, index) => (
+                  <div key={index} className="relative group">
                     <div className="w-24 h-24 bg-white p-2 shadow-sm rounded-lg border border-gray-200">
                       <Image
-                        src={link}
+                        src={imageUrl}
                         alt="product image"
                         width={80}
                         height={80}
@@ -470,7 +506,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           type="number"
                           step="0.01"
                           placeholder="0.00"
-                          {...field}
+                          value={field.value || ""}
                           onChange={(e) =>
                             field.onChange(
                               parseFloat(e.target.value) || undefined
@@ -494,7 +530,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           type="number"
                           step="0.01"
                           placeholder="0.00"
-                          {...field}
+                          value={field.value || ""}
                           onChange={(e) =>
                             field.onChange(
                               parseFloat(e.target.value) || undefined
@@ -781,7 +817,18 @@ const ProductForm = ({ _id, initialData = {} }) => {
           </Card>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                console.log("Current form values:", getValues());
+                console.log("Form errors:", form.formState.errors);
+                console.log("Form valid:", form.formState.isValid);
+              }}
+            >
+              Debug Form
+            </Button>
             <Button
               type="submit"
               size="lg"
