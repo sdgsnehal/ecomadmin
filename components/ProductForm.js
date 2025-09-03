@@ -478,7 +478,9 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   name="originalPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Original Price</FormLabel>
+                      <FormLabel>
+                        Original Price <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"

@@ -1,4 +1,5 @@
 import Layout from "@/components/layout";
+import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -6,16 +7,14 @@ import { useEffect, useState } from "react";
 const Products = () => {
   const [products, setProducts] = useState([]);
   useEffect(() => {
-    axios.get("/api/products").then((res) => {
+    fetchFromBackend("products/get-all").then((res) => {
       setProducts(res.data);
     });
   }, []);
+  console.log(products);
   return (
     <Layout>
-      <Link
-        href={"/products/new"}
-        className="btn-primary"
-      >
+      <Link href={"/products/new"} className="btn-primary">
         {" "}
         Add new products
       </Link>
@@ -23,14 +22,19 @@ const Products = () => {
         <thead>
           <tr>
             <td>Product Name</td>
+            <td>SKu</td>
           </tr>
         </thead>
         <tbody>
           {products.map((product) => (
-            <tr key={product.title}>
-              <td>{product.title}</td>
+            <tr key={product.name}>
+              <td>{product.name}</td>
+              <td>{product.sku}</td>
               <td>
-                <Link className="btn-default" href={"/products/edit/" + product._id}>
+                <Link
+                  className="btn-default"
+                  href={"/products/edit/" + product._id}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -47,7 +51,10 @@ const Products = () => {
                   </svg>
                   Edit
                 </Link>
-                <Link className="btn-red" href={"/products/delete/" + product._id}>
+                <Link
+                  className="btn-red"
+                  href={"/products/delete/" + product._id}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
