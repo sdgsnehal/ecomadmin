@@ -48,12 +48,11 @@ const productFormSchema = z.object({
   reviewCount: z.number().min(0).default(0),
   description: z.string().optional(),
   weights: z.array(weightOptionSchema).default([]),
-  sku: z.string().min(1, "SKU is required"),
   categories: z.array(z.string()).default([]),
   detailedDescription: z.string().optional(),
   inStock: z.boolean().default(true),
   stockText: z.string().optional(),
-  originalPrice: z.number().min(0, "Original price must be positive"),
+  originalPrice: z.number().min(100, "Original price must be positive"),
   currentPrice: z.number().optional(),
   features: z.array(z.string()).default([]),
   salePrice: z.number().optional(),
@@ -89,7 +88,6 @@ const ProductForm = ({ _id, initialData = {} }) => {
       reviewCount: initialData?.reviewCount || 0,
       description: initialData?.description || "",
       weights: initialData?.weights || [],
-      sku: initialData?.sku || "",
       categories: initialData?.categories || [],
       detailedDescription: initialData?.detailedDescription || "",
       inStock: initialData?.inStock ?? true,
@@ -279,7 +277,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   )}
                 />
 
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="sku"
                   render={({ field }) => (
@@ -293,7 +291,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
 
               <FormField
