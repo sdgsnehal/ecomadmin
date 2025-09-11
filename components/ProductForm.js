@@ -139,8 +139,6 @@ const ProductForm = ({ _id, initialData = {} }) => {
         body: formData,
       });
 
-      console.log("Upload response:", res);
-
       // Backend returns { data: [{ url: "...", public_id: "..." }] }
       const newImageUrls = res.data.map((item) => item.url);
       const updatedImages = [...watchedImages, ...newImageUrls];
@@ -215,23 +213,15 @@ const ProductForm = ({ _id, initialData = {} }) => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form submission started");
-    console.log("Submitting data:", data);
-
     setIsSubmitting(true);
     try {
       const endpoint = _id ? `products/${_id}` : "products/create";
       const method = _id ? "PUT" : "POST";
-
-      console.log("Endpoint:", endpoint);
-      console.log("Method:", method);
-
       const response = await fetchFromBackend(endpoint, {
         method,
         body: JSON.stringify(data),
       });
 
-      console.log("Backend response:", response);
       router.push("/products");
     } catch (error) {
       console.error("Error saving product:", error);
