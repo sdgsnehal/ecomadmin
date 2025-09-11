@@ -1,5 +1,6 @@
 import Layout from "@/components/layout";
 import ProductForm from "@/components/ProductForm";
+import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -11,14 +12,15 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (!id) return;
-    axios.get("/api/products?id=" + id).then((res) => {
+    fetchFromBackend("products/" + id).then((res) => {
+      console.log("Product info:", res.data);
       setProductInfo(res.data);
     });
   }, [id]);
   return (
     <Layout>
       <h1>Edit Product</h1>
-      {productInfo && <ProductForm {...productInfo} />}
+      {productInfo && <ProductForm initialData={productInfo} />}
     </Layout>
   );
 }

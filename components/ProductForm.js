@@ -71,6 +71,7 @@ const productFormSchema = z.object({
 });
 
 const ProductForm = ({ _id, initialData = {} }) => {
+  console.log("Initial data:", initialData);
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,6 +85,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
       name: initialData?.name || "",
       image: initialData?.image || [],
       tags: initialData?.tags || [],
+      sku: initialData?.sku || "",
       rating: initialData?.rating || 0,
       reviewCount: initialData?.reviewCount || 0,
       description: initialData?.description || "",
@@ -267,7 +269,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   )}
                 />
 
-                {/* <FormField
+                <FormField
                   control={form.control}
                   name="sku"
                   render={({ field }) => (
@@ -276,12 +278,12 @@ const ProductForm = ({ _id, initialData = {} }) => {
                         SKU <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter SKU" {...field} />
+                        <Input placeholder="Enter SKU" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
               </div>
 
               <FormField
