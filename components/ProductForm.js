@@ -56,7 +56,7 @@ const productFormSchema = z.object({
   currentPrice: z.number().optional(),
   features: z.array(z.string()).default([]),
   salePrice: z.number().optional(),
-  currency: z.string().default("$"),
+  currency: z.string().default("₹"),
   badge: z
     .object({
       text: z.string().optional(),
@@ -98,7 +98,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
       currentPrice: initialData?.currentPrice,
       features: initialData?.features || [],
       salePrice: initialData?.salePrice,
-      currency: initialData?.currency || "$",
+      currency: initialData?.currency || "₹",
       badge: initialData?.badge || { text: "", bgColor: "", textColor: "" },
       isBestSeller: initialData?.isBestSeller || false,
       isOnSale: initialData?.isOnSale || false,
