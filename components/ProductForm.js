@@ -769,9 +769,26 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Badge Text</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., NEW, SALE" {...field} />
-                      </FormControl>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select badge text" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="NEW">NEW</SelectItem>
+                          <SelectItem value="SALE">SALE</SelectItem>
+                          <SelectItem value="HOT">HOT</SelectItem>
+                          <SelectItem value="BEST SELLER">BEST SELLER</SelectItem>
+                          <SelectItem value="LIMITED">LIMITED</SelectItem>
+                          <SelectItem value="TRENDING">TRENDING</SelectItem>
+                          <SelectItem value="FEATURED">FEATURED</SelectItem>
+                          <SelectItem value="POPULAR">POPULAR</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -783,9 +800,90 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Background Color</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., #ff0000" {...field} />
-                      </FormControl>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select background color" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="#ef4444">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#ef4444" }}
+                              ></div>
+                              <span>Red</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#f59e0b">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#f59e0b" }}
+                              ></div>
+                              <span>Orange</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#10b981">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#10b981" }}
+                              ></div>
+                              <span>Green</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#3b82f6">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#3b82f6" }}
+                              ></div>
+                              <span>Blue</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#8b5cf6">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#8b5cf6" }}
+                              ></div>
+                              <span>Purple</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#ec4899">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#ec4899" }}
+                              ></div>
+                              <span>Pink</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#000000">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#000000" }}
+                              ></div>
+                              <span>Black</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#64748b">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#64748b" }}
+                              ></div>
+                              <span>Gray</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -797,9 +895,81 @@ const ProductForm = ({ _id, initialData = {} }) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Text Color</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., #ffffff" {...field} />
-                      </FormControl>
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select text color" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="#ffffff">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border border-gray-300"
+                                style={{ backgroundColor: "#ffffff" }}
+                              ></div>
+                              <span>White</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#000000">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#000000" }}
+                              ></div>
+                              <span>Black</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#ef4444">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#ef4444" }}
+                              ></div>
+                              <span>Red</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#f59e0b">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#f59e0b" }}
+                              ></div>
+                              <span>Orange</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#10b981">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#10b981" }}
+                              ></div>
+                              <span>Green</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#3b82f6">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#3b82f6" }}
+                              ></div>
+                              <span>Blue</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="#64748b">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded border"
+                                style={{ backgroundColor: "#64748b" }}
+                              ></div>
+                              <span>Gray</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
