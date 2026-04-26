@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
 import Image from "next/image";
 
 // shadcn/ui imports
@@ -116,7 +115,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const result = await axios.get("/api/categories");
+        const result = await fetchFromBackend("categories/get-all");
         setCategories(result.data);
       } catch (error) {
         console.error("Error fetching categories:", error);

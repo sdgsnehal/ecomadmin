@@ -1,5 +1,5 @@
 import Layout from "@/components/layout";
-import axios from "axios";
+import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -13,10 +13,9 @@ const Categories = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
-  function fetchCategories() {
-    axios.get("/api/categories").then((response) => {
-      setCategories(response.data);
-    });
+  async function fetchCategories() {
+    const result = await fetchFromBackend("categories/get-all");
+    setCategories(result.data);
   }
   async function saveCategory(e) {
     e.preventDefault();
@@ -30,14 +29,16 @@ const Categories = () => {
     };
 
     if (editedCategory) {
-      axios.put("/api/categories", {
-        ...data,
-        _id: editedCategory._id,
+      await fetchFromBackend(`categories/${editedCategory._id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
       });
       setEditedCategory(null);
     } else {
-      console.log("creating category", data);
-      await axios.post("/api/categories", { ...data });
+      await fetchFromBackend("categories/create", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
       setProperties([]);
       setParentCategory("");
     }
@@ -74,7 +75,7 @@ const Categories = () => {
             text: "Category has been deleted.",
             icon: "success",
           });
-          await axios.delete("/api/categories?_id=" + _id);
+          await fetchFromBackend(`categories/${_id}`, { method: "DELETE" });
           fetchCategories();
         }
       });
