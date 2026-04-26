@@ -12,7 +12,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   adapter: MongoDBAdapter(client),
   session: {
     strategy: "jwt",
