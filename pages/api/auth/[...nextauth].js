@@ -13,7 +13,7 @@ export const authOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  adapter: MongoDBAdapter(client),
+  //adapter: MongoDBAdapter(client),
   session: {
     strategy: "jwt",
   },
