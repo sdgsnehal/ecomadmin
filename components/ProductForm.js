@@ -58,9 +58,9 @@ const productFormSchema = z.object({
   currency: z.string().default("₹"),
   badge: z
     .object({
-      text: z.string().optional(),
-      bgColor: z.string().optional(),
-      textColor: z.string().optional(),
+      text: z.string().min(1, "Badge text is required"),
+      bgColor: z.string().min(1, "Badge background color is required"),
+      textColor: z.string().min(1, "Badge text color is required"),
     })
     .optional(),
   isBestSeller: z.boolean().default(false),
@@ -157,7 +157,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
 
   const removeImage = (indexToRemove) => {
     const newImages = watchedImages.filter(
-      (_, index) => index !== indexToRemove
+      (_, index) => index !== indexToRemove,
     );
     setValue("image", newImages);
   };
@@ -172,7 +172,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   const removeTag = (tagToRemove) => {
     setValue(
       "tags",
-      watchedTags.filter((tag) => tag !== tagToRemove)
+      watchedTags.filter((tag) => tag !== tagToRemove),
     );
   };
 
@@ -189,7 +189,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   const removeFeature = (featureToRemove) => {
     setValue(
       "features",
-      watchedFeatures.filter((feature) => feature !== featureToRemove)
+      watchedFeatures.filter((feature) => feature !== featureToRemove),
     );
   };
 
@@ -209,7 +209,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   const removeWeightOption = (index) => {
     setValue(
       "weights",
-      watchedWeights.filter((_, i) => i !== index)
+      watchedWeights.filter((_, i) => i !== index),
     );
   };
 
@@ -500,7 +500,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           value={field.value || ""}
                           onChange={(e) =>
                             field.onChange(
-                              parseFloat(e.target.value) || undefined
+                              parseFloat(e.target.value) || undefined,
                             )
                           }
                         />
@@ -524,7 +524,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           value={field.value || ""}
                           onChange={(e) =>
                             field.onChange(
-                              parseFloat(e.target.value) || undefined
+                              parseFloat(e.target.value) || undefined,
                             )
                           }
                         />
@@ -573,7 +573,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           updateWeightOption(
                             index,
                             "originalPrice",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         placeholder="0.00"
@@ -587,7 +587,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           updateWeightOption(
                             index,
                             "currentPrice",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         placeholder="0.00"
@@ -781,7 +781,9 @@ const ProductForm = ({ _id, initialData = {} }) => {
                           <SelectItem value="NEW">NEW</SelectItem>
                           <SelectItem value="SALE">SALE</SelectItem>
                           <SelectItem value="HOT">HOT</SelectItem>
-                          <SelectItem value="BEST SELLER">BEST SELLER</SelectItem>
+                          <SelectItem value="BEST SELLER">
+                            BEST SELLER
+                          </SelectItem>
                           <SelectItem value="LIMITED">LIMITED</SelectItem>
                           <SelectItem value="TRENDING">TRENDING</SelectItem>
                           <SelectItem value="FEATURED">FEATURED</SelectItem>
