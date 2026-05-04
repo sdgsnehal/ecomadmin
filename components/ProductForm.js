@@ -40,6 +40,7 @@ const weightOptionSchema = z.object({
 });
 
 const productFormSchema = z.object({
+  seller: z.string().min(1, "Seller is required"),
   name: z.string().min(1, "Product name is required"),
   image: z.array(z.string()).min(1, "At least one image is required"),
   tags: z.array(z.string()).default([]),
@@ -73,6 +74,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   console.log("Initial data:", initialData);
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [sellers, setSellers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentTag, setCurrentTag] = useState("");
   const [currentFeature, setCurrentFeature] = useState("");
@@ -81,6 +83,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
   const form = useForm({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
+      seller: initialData?.seller?._id || initialData?.seller || "",
       name: initialData?.name || "",
       image: initialData?.image || [],
       tags: initialData?.tags || [],
@@ -121,7 +124,16 @@ const ProductForm = ({ _id, initialData = {} }) => {
         console.error("Error fetching categories:", error);
       }
     };
+    const fetchSellers = async () => {
+      try {
+        const result = await fetchFromBackend("sellers/get-all");
+        setSellers(result.data);
+      } catch (error) {
+        console.error("Error fetching sellers:", error);
+      }
+    };
     fetchCategories();
+    fetchSellers();
   }, []);
 
   const uploadImages = async (e) => {
@@ -252,6 +264,33 @@ const ProductForm = ({ _id, initialData = {} }) => {
               <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="seller"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Seller <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select seller" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {sellers.map((seller) => (
+                            <SelectItem key={seller._id} value={seller._id}>
+                              {seller.businessName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="name"

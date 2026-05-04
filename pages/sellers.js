@@ -19,7 +19,10 @@ const sellerSchema = z.object({
   phone: z.string().min(10, "Enter a valid phone number"),
   GSTNumber: z
     .string()
-    .regex(/^[A-Z0-9]{15}$/, "GST must be 15 alphanumeric characters")
+    .regex(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+      "Invalid GSTIN (e.g. 27AAAAA0000A1Z5)"
+    )
     .or(z.literal(""))
     .optional(),
   address: z.string().optional(),
