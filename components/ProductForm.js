@@ -70,7 +70,7 @@ const productFormSchema = z.object({
   ladduTypes: z.string().optional(),
 });
 
-const ProductForm = ({ _id, initialData = {} }) => {
+const ProductForm = ({ _id, initialData = {}, readOnly = false }) => {
   console.log("Initial data:", initialData);
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -109,7 +109,7 @@ const ProductForm = ({ _id, initialData = {} }) => {
     },
   });
 
-  const { watch, setValue, getValues } = form;
+  const { watch, setValue } = form;
   const watchedImages = watch("image");
   const watchedTags = watch("tags");
   const watchedFeatures = watch("features");
@@ -1019,34 +1019,25 @@ const ProductForm = ({ _id, initialData = {} }) => {
           </Card>
 
           {/* Submit Button */}
-          <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                console.log("Current form values:", getValues());
-                console.log("Form errors:", form.formState.errors);
-                console.log("Form valid:", form.formState.isValid);
-              }}
-            >
-              Debug Form
-            </Button>
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isSubmitting}
-              className="min-w-[120px]"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Product"
-              )}
-            </Button>
-          </div>
+          {!readOnly && (
+            <div className="flex justify-end gap-4">
+              <Button
+                type="submit"
+                size="lg"
+                disabled={isSubmitting}
+                className="min-w-[120px]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Product"
+                )}
+              </Button>
+            </div>
+          )}
         </form>
       </Form>
     </div>

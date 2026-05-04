@@ -94,6 +94,30 @@ const INDIAN_STATES = [
   "Puducherry",
 ];
 
+const SellerMenu = ({ seller, confirmDelete }) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <button className="btn-default p-1.5">
+        <EllipsisVertical className="w-4 h-4" />
+      </button>
+    </PopoverTrigger>
+    <PopoverContent className="w-36 p-1" align="end">
+      <Link
+        href={`/sellers/${seller._id}`}
+        className="flex w-full items-center gap-2 rounded px-3 py-1.5 text-sm hover:bg-gray-100"
+      >
+        View
+      </Link>
+      <button
+        onClick={() => confirmDelete(seller)}
+        className="flex w-full items-center gap-2 rounded px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+      >
+        Delete
+      </button>
+    </PopoverContent>
+  </Popover>
+);
+
 const Sellers = () => {
   const [sellers, setSellers] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -424,75 +448,102 @@ const Sellers = () => {
       )}
 
       {!showForm && (
-        <table className="basic mt-2">
-          <thead>
-            <tr>
-              <td>Business</td>
-              <td>Owner</td>
-              <td>Contact</td>
-              <td>GST</td>
-              <td>Location</td>
-              <td>Rating</td>
-              <td></td>
-            </tr>
-          </thead>
-          <tbody>
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block">
+            <table className="basic mt-2">
+              <thead>
+                <tr>
+                  <td>Business</td>
+                  <td>Owner</td>
+                  <td>Contact</td>
+                  <td>GST</td>
+                  <td>Location</td>
+                  <td>Rating</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                {sellers.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="text-center text-gray-400 py-8">
+                      No sellers yet. Click &quot;+ Add Seller&quot; to get started.
+                    </td>
+                  </tr>
+                )}
+                {sellers.map((seller) => (
+                  <tr key={seller._id}>
+                    <td className="font-medium">{seller.businessName}</td>
+                    <td>{seller.name}</td>
+                    <td>
+                      <div className="text-sm">{seller.email}</div>
+                      <div className="text-xs text-gray-400">{seller.phone}</div>
+                    </td>
+                    <td className="text-sm font-mono">{seller.GSTNumber || "—"}</td>
+                    <td className="text-sm">
+                      {[seller.city, seller.state].filter(Boolean).join(", ") || "—"}
+                    </td>
+                    <td className="text-sm">
+                      {seller.rating > 0 ? (
+                        <span className="flex items-center gap-1">
+                          &#9733; {Number(seller.rating).toFixed(1)}
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      <SellerMenu seller={seller} confirmDelete={confirmDelete} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden flex flex-col gap-3 mt-2">
             {sellers.length === 0 && (
-              <tr>
-                <td colSpan={7} className="text-center text-gray-400 py-8">
-                  No sellers yet. Click &quot;+ Add Seller&quot; to get started.
-                </td>
-              </tr>
+              <p className="text-center text-gray-400 py-8">
+                No sellers yet. Click &quot;+ Add Seller&quot; to get started.
+              </p>
             )}
             {sellers.map((seller) => (
-              <tr key={seller._id}>
-                <td className="font-medium">{seller.businessName}</td>
-                <td>{seller.name}</td>
-                <td>
-                  <div className="text-sm">{seller.email}</div>
-                  <div className="text-xs text-gray-400">{seller.phone}</div>
-                </td>
-                <td className="text-sm font-mono">{seller.GSTNumber || "—"}</td>
-                <td className="text-sm">
-                  {[seller.city, seller.state].filter(Boolean).join(", ") ||
-                    "—"}
-                </td>
-                <td className="text-sm">
-                  {seller.rating > 0 ? (
-                    <span className="flex items-center gap-1">
-                      &#9733; {Number(seller.rating).toFixed(1)}
-                    </span>
-                  ) : (
-                    "—"
+              <div
+                key={seller._id}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm p-4"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="font-semibold text-gray-800 text-sm">
+                      {seller.businessName}
+                    </p>
+                    <p className="text-xs text-gray-500">{seller.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {seller.rating > 0 && (
+                      <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded-full">
+                        &#9733; {Number(seller.rating).toFixed(1)}
+                      </span>
+                    )}
+                    <SellerMenu seller={seller} confirmDelete={confirmDelete} />
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-600 space-y-0.5">
+                  <p>{seller.email}</p>
+                  <p>{seller.phone}</p>
+                  <p>
+                    {[seller.city, seller.state].filter(Boolean).join(", ") || "—"}
+                  </p>
+                  {seller.GSTNumber && (
+                    <p className="font-mono text-gray-400">{seller.GSTNumber}</p>
                   )}
-                </td>
-                <td>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className="btn-default p-1.5">
-                        <EllipsisVertical className="w-4 h-4" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-36 p-1" align="end">
-                      <Link
-                        href={`/sellers/${seller._id}`}
-                        className="flex w-full items-center gap-2 rounded px-3 py-1.5 text-sm hover:bg-gray-100"
-                      >
-                        View
-                      </Link>
-                      <button
-                        onClick={() => confirmDelete(seller)}
-                        className="flex w-full items-center gap-2 rounded px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
-                    </PopoverContent>
-                  </Popover>
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </>
       )}
     </Layout>
   );
