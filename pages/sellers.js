@@ -25,24 +25,18 @@ const sellerSchema = z.object({
     )
     .or(z.literal(""))
     .optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  pincode: z
-    .string()
-    .regex(/^\d{6}$/, "Pincode must be 6 digits")
-    .or(z.literal(""))
-    .optional(),
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  pincode: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
   rating: z.coerce.number().min(0, "Min 0").max(5, "Max 5"),
   bankDetails: z.object({
-    accountHolderName: z.string().optional(),
-    bankName: z.string().optional(),
-    accountNumber: z.string().optional(),
+    accountHolderName: z.string().min(1, "Account holder name is required"),
+    bankName: z.string().min(1, "Bank name is required"),
+    accountNumber: z.string().min(1, "Account number is required"),
     ifscCode: z
       .string()
-      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code")
-      .or(z.literal(""))
-      .optional(),
+      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
   }),
 });
 
@@ -312,26 +306,28 @@ const Sellers = () => {
               Address
             </p>
             <div>
-              <label>Street Address</label>
+              <label>Street Address *</label>
               <input
                 name="address"
                 value={form.address}
                 onChange={handleField}
                 placeholder="Building / Street"
               />
+              {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4">
               <div>
-                <label>City</label>
+                <label>City *</label>
                 <input
                   name="city"
                   value={form.city}
                   onChange={handleField}
                   placeholder="Mumbai"
                 />
+                {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
               </div>
               <div>
-                <label>State</label>
+                <label>State *</label>
                 <select name="state" value={form.state} onChange={handleField}>
                   <option value="">Select state</option>
                   {INDIAN_STATES.map((s) => (
@@ -340,9 +336,10 @@ const Sellers = () => {
                     </option>
                   ))}
                 </select>
+                {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
               </div>
               <div>
-                <label>Pincode</label>
+                <label>Pincode *</label>
                 <input
                   name="pincode"
                   value={form.pincode}
@@ -360,34 +357,43 @@ const Sellers = () => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
               <div>
-                <label>Account Holder Name</label>
+                <label>Account Holder Name *</label>
                 <input
                   name="accountHolderName"
                   value={form.bankDetails.accountHolderName}
                   onChange={handleBankField}
                   placeholder="As per bank records"
                 />
+                {errors["bankDetails.accountHolderName"] && (
+                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.accountHolderName"]}</p>
+                )}
               </div>
               <div>
-                <label>Bank Name</label>
+                <label>Bank Name *</label>
                 <input
                   name="bankName"
                   value={form.bankDetails.bankName}
                   onChange={handleBankField}
                   placeholder="State Bank of India"
                 />
+                {errors["bankDetails.bankName"] && (
+                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.bankName"]}</p>
+                )}
               </div>
               <div>
-                <label>Account Number</label>
+                <label>Account Number *</label>
                 <input
                   name="accountNumber"
                   value={form.bankDetails.accountNumber}
                   onChange={handleBankField}
                   placeholder="1234567890"
                 />
+                {errors["bankDetails.accountNumber"] && (
+                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.accountNumber"]}</p>
+                )}
               </div>
               <div>
-                <label>IFSC Code</label>
+                <label>IFSC Code *</label>
                 <input
                   name="ifscCode"
                   value={form.bankDetails.ifscCode}
