@@ -2,6 +2,8 @@ import Layout from "@/components/layout";
 import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Upload, X, Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
 const INDIAN_STATES = [
@@ -21,6 +23,8 @@ const ViewSeller = () => {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingProduct, setUploadingProduct] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -49,8 +53,38 @@ const ViewSeller = () => {
         ifscCode: seller.bankDetails?.ifscCode || "",
         bankName: seller.bankDetails?.bankName || "",
       },
+      profileImages: seller.profileImages || [],
+      productImages: seller.productImages || [],
     });
     setEditing(true);
+  }
+
+  async function uploadImages(e, field, setUploading) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      for (const file of files) formData.append("image", file);
+      const res = await fetchFromBackend("products/upload-images", {
+        method: "POST",
+        body: formData,
+      });
+      const urls = res.data.map((item) => item.url);
+      setForm((prev) => ({ ...prev, [field]: [...(prev[field] || []), ...urls] }));
+      e.target.value = "";
+    } catch (err) {
+      Swal.fire({ title: "Upload failed", text: err.message, icon: "error" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(field, index) {
+    setForm((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
   }
 
   function cancelEdit() {
@@ -75,10 +109,10 @@ const ViewSeller = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      const { name, email, phone, businessName, GSTNumber, address, city, state, pincode, bankDetails } = form;
+      const { name, email, phone, businessName, GSTNumber, address, city, state, pincode, bankDetails, profileImages, productImages } = form;
       const res = await fetchFromBackend(`sellers/${id}`, {
         method: "PUT",
-        body: JSON.stringify({ name, email, phone, businessName, GSTNumber, address, city, state, pincode, bankDetails }),
+        body: JSON.stringify({ name, email, phone, businessName, GSTNumber, address, city, state, pincode, bankDetails, profileImages, productImages }),
       });
       setSeller(res.data ?? { ...seller, ...form });
       setEditing(false);
@@ -211,6 +245,56 @@ const ViewSeller = () => {
               </div>
             </div>
 
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+              <p className="text-xs font-semibold uppercase text-gray-400 tracking-wide mb-4">
+                Images
+              </p>
+              {[
+                { label: "Profile Images", field: "profileImages", uploading: uploadingProfile, setUploading: setUploadingProfile },
+                { label: "Product Images", field: "productImages", uploading: uploadingProduct, setUploading: setUploadingProduct },
+              ].map(({ label, field, uploading, setUploading }) => (
+                <div key={field} className="mb-4">
+                  <p className="text-xs text-gray-400 mb-2">{label}</p>
+                  <div className="flex flex-wrap gap-3">
+                    {(form[field] || []).map((url, i) => (
+                      <div key={i} className="relative group w-24 h-24">
+                        <Image
+                          src={url}
+                          alt={label}
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(field, i)}
+                          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {uploading && (
+                      <div className="w-24 h-24 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                        <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                      </div>
+                    )}
+                    <label className="w-24 h-24 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-xs text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors">
+                      <Upload className="w-4 h-4 mb-1" />
+                      <span>Upload</span>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => uploadImages(e, field, setUploading)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <div className="flex gap-2">
               <button type="button" onClick={cancelEdit} className="btn-default">
                 Cancel
@@ -263,7 +347,7 @@ const ViewSeller = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4">
               <h2 className="text-sm font-semibold uppercase text-gray-400 tracking-wide mb-4">
                 Bank Details
               </h2>
@@ -280,6 +364,48 @@ const ViewSeller = () => {
                 />
               </div>
             </div>
+
+            {(seller.profileImages?.length > 0 || seller.productImages?.length > 0) && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 className="text-sm font-semibold uppercase text-gray-400 tracking-wide mb-4">
+                  Images
+                </h2>
+                {seller.profileImages?.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-400 mb-2">Profile Images</p>
+                    <div className="flex flex-wrap gap-3">
+                      {seller.profileImages.map((url, i) => (
+                        <Image
+                          key={i}
+                          src={url}
+                          alt="profile"
+                          width={96}
+                          height={96}
+                          className="w-24 h-24 rounded-lg object-cover border border-gray-200"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {seller.productImages?.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Product Images</p>
+                    <div className="flex flex-wrap gap-3">
+                      {seller.productImages.map((url, i) => (
+                        <Image
+                          key={i}
+                          src={url}
+                          alt="product"
+                          width={96}
+                          height={96}
+                          className="w-24 h-24 rounded-lg object-cover border border-blue-100"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

@@ -2,9 +2,10 @@ import Layout from "@/components/layout";
 import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Upload, X, Loader2 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -21,7 +22,7 @@ const sellerSchema = z.object({
     .string()
     .regex(
       /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-      "Invalid GSTIN (e.g. 27AAAAA0000A1Z5)"
+      "Invalid GSTIN (e.g. 27AAAAA0000A1Z5)",
     )
     .or(z.literal(""))
     .optional(),
@@ -34,10 +35,10 @@ const sellerSchema = z.object({
     accountHolderName: z.string().min(1, "Account holder name is required"),
     bankName: z.string().min(1, "Bank name is required"),
     accountNumber: z.string().min(1, "Account number is required"),
-    ifscCode: z
-      .string()
-      .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
+    ifscCode: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
   }),
+  profileImages: z.array(z.string()).optional(),
+  productImages: z.array(z.string()).optional(),
 });
 
 const emptySeller = {
@@ -57,6 +58,8 @@ const emptySeller = {
     bankName: "",
   },
   rating: 0,
+  profileImages: [],
+  productImages: [],
 };
 
 const INDIAN_STATES = [
@@ -125,6 +128,8 @@ const Sellers = () => {
   const [form, setForm] = useState(emptySeller);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingProduct, setUploadingProduct] = useState(false);
 
   useEffect(() => {
     fetchSellers();
@@ -159,6 +164,37 @@ const Sellers = () => {
       bankDetails: { ...prev.bankDetails, [name]: value },
     }));
     setErrors((prev) => ({ ...prev, [`bankDetails.${name}`]: undefined }));
+  }
+
+  async function uploadImages(e, field, setUploading) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      for (const file of files) formData.append("image", file);
+      const res = await fetchFromBackend("products/upload-images", {
+        method: "POST",
+        body: formData,
+      });
+      const urls = res.data.map((item) => item.url);
+      setForm((prev) => ({
+        ...prev,
+        [field]: [...(prev[field] || []), ...urls],
+      }));
+      e.target.value = "";
+    } catch (err) {
+      Swal.fire({ title: "Upload failed", text: err.message, icon: "error" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(field, index) {
+    setForm((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
   }
 
   async function saveSeller(e) {
@@ -266,7 +302,11 @@ const Sellers = () => {
                   onChange={handleField}
                   placeholder="e.g. Sharma Traders"
                 />
-                {errors.businessName && <p className="text-xs text-red-500 mt-1">{errors.businessName}</p>}
+                {errors.businessName && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.businessName}
+                  </p>
+                )}
               </div>
               <div>
                 <label>GST Number</label>
@@ -277,7 +317,11 @@ const Sellers = () => {
                   placeholder="e.g. 22AAAAA0000A1Z5"
                   maxLength={15}
                 />
-                {errors.GSTNumber && <p className="text-xs text-red-500 mt-1">{errors.GSTNumber}</p>}
+                {errors.GSTNumber && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.GSTNumber}
+                  </p>
+                )}
               </div>
               <div>
                 <label>Owner / Contact Name *</label>
@@ -287,7 +331,9 @@ const Sellers = () => {
                   onChange={handleField}
                   placeholder="Full name"
                 />
-                {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+                {errors.name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                )}
               </div>
               <div>
                 <label>Email *</label>
@@ -298,7 +344,9 @@ const Sellers = () => {
                   onChange={handleField}
                   placeholder="seller@example.com"
                 />
-                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
               </div>
               <div>
                 <label>Phone *</label>
@@ -308,7 +356,9 @@ const Sellers = () => {
                   onChange={handleField}
                   placeholder="+91 98765 43210"
                 />
-                {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
+                {errors.phone && (
+                  <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+                )}
               </div>
               <div>
                 <label>Rating (0–5)</label>
@@ -321,7 +371,9 @@ const Sellers = () => {
                   max={5}
                   step={0.1}
                 />
-                {errors.rating && <p className="text-xs text-red-500 mt-1">{errors.rating}</p>}
+                {errors.rating && (
+                  <p className="text-xs text-red-500 mt-1">{errors.rating}</p>
+                )}
               </div>
             </div>
 
@@ -337,7 +389,9 @@ const Sellers = () => {
                 onChange={handleField}
                 placeholder="Building / Street"
               />
-              {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
+              {errors.address && (
+                <p className="text-xs text-red-500 mt-1">{errors.address}</p>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4">
               <div>
@@ -348,7 +402,9 @@ const Sellers = () => {
                   onChange={handleField}
                   placeholder="Mumbai"
                 />
-                {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
+                {errors.city && (
+                  <p className="text-xs text-red-500 mt-1">{errors.city}</p>
+                )}
               </div>
               <div>
                 <label>State *</label>
@@ -360,7 +416,9 @@ const Sellers = () => {
                     </option>
                   ))}
                 </select>
-                {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
+                {errors.state && (
+                  <p className="text-xs text-red-500 mt-1">{errors.state}</p>
+                )}
               </div>
               <div>
                 <label>Pincode *</label>
@@ -371,7 +429,9 @@ const Sellers = () => {
                   placeholder="400001"
                   maxLength={6}
                 />
-                {errors.pincode && <p className="text-xs text-red-500 mt-1">{errors.pincode}</p>}
+                {errors.pincode && (
+                  <p className="text-xs text-red-500 mt-1">{errors.pincode}</p>
+                )}
               </div>
             </div>
 
@@ -389,7 +449,9 @@ const Sellers = () => {
                   placeholder="As per bank records"
                 />
                 {errors["bankDetails.accountHolderName"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.accountHolderName"]}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors["bankDetails.accountHolderName"]}
+                  </p>
                 )}
               </div>
               <div>
@@ -401,7 +463,9 @@ const Sellers = () => {
                   placeholder="State Bank of India"
                 />
                 {errors["bankDetails.bankName"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.bankName"]}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors["bankDetails.bankName"]}
+                  </p>
                 )}
               </div>
               <div>
@@ -413,7 +477,9 @@ const Sellers = () => {
                   placeholder="1234567890"
                 />
                 {errors["bankDetails.accountNumber"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.accountNumber"]}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors["bankDetails.accountNumber"]}
+                  </p>
                 )}
               </div>
               <div>
@@ -426,10 +492,71 @@ const Sellers = () => {
                   maxLength={11}
                 />
                 {errors["bankDetails.ifscCode"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["bankDetails.ifscCode"]}</p>
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors["bankDetails.ifscCode"]}
+                  </p>
                 )}
               </div>
             </div>
+
+            {/* Images */}
+            <p className="text-xs font-semibold uppercase text-gray-400 mb-2 mt-4 tracking-wide">
+              Images
+            </p>
+            {[
+              {
+                label: "Profile Images",
+                field: "profileImages",
+                uploading: uploadingProfile,
+                setUploading: setUploadingProfile,
+              },
+              {
+                label: "Product Images",
+                field: "productImages",
+                uploading: uploadingProduct,
+                setUploading: setUploadingProduct,
+              },
+            ].map(({ label, field, uploading, setUploading }) => (
+              <div key={field} className="mb-4">
+                <label className="mb-1 block">{label}</label>
+                <div className="flex flex-wrap gap-3">
+                  {(form[field] || []).map((url, i) => (
+                    <div key={i} className="relative group w-24 h-24">
+                      <Image
+                        src={url}
+                        alt={label}
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(field, i)}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {uploading && (
+                    <div className="w-24 h-24 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                    </div>
+                  )}
+                  <label className="w-24 h-24 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-xs text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors">
+                    <Upload className="w-4 h-4 mb-1" />
+                    <span>Upload</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => uploadImages(e, field, setUploading)}
+                    />
+                  </label>
+                </div>
+              </div>
+            ))}
 
             <div className="flex gap-2 mt-4">
               <button type="button" onClick={cancel} className="btn-default">
@@ -467,7 +594,8 @@ const Sellers = () => {
                 {sellers.length === 0 && (
                   <tr>
                     <td colSpan={7} className="text-center text-gray-400 py-8">
-                      No sellers yet. Click &quot;+ Add Seller&quot; to get started.
+                      No sellers yet. Click &quot;+ Add Seller&quot; to get
+                      started.
                     </td>
                   </tr>
                 )}
@@ -477,11 +605,16 @@ const Sellers = () => {
                     <td>{seller.name}</td>
                     <td>
                       <div className="text-sm">{seller.email}</div>
-                      <div className="text-xs text-gray-400">{seller.phone}</div>
+                      <div className="text-xs text-gray-400">
+                        {seller.phone}
+                      </div>
                     </td>
-                    <td className="text-sm font-mono">{seller.GSTNumber || "—"}</td>
+                    <td className="text-sm font-mono">
+                      {seller.GSTNumber || "—"}
+                    </td>
                     <td className="text-sm">
-                      {[seller.city, seller.state].filter(Boolean).join(", ") || "—"}
+                      {[seller.city, seller.state].filter(Boolean).join(", ") ||
+                        "—"}
                     </td>
                     <td className="text-sm">
                       {seller.rating > 0 ? (
@@ -493,7 +626,10 @@ const Sellers = () => {
                       )}
                     </td>
                     <td>
-                      <SellerMenu seller={seller} confirmDelete={confirmDelete} />
+                      <SellerMenu
+                        seller={seller}
+                        confirmDelete={confirmDelete}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -534,10 +670,13 @@ const Sellers = () => {
                   <p>{seller.email}</p>
                   <p>{seller.phone}</p>
                   <p>
-                    {[seller.city, seller.state].filter(Boolean).join(", ") || "—"}
+                    {[seller.city, seller.state].filter(Boolean).join(", ") ||
+                      "—"}
                   </p>
                   {seller.GSTNumber && (
-                    <p className="font-mono text-gray-400">{seller.GSTNumber}</p>
+                    <p className="font-mono text-gray-400">
+                      {seller.GSTNumber}
+                    </p>
                   )}
                 </div>
               </div>
