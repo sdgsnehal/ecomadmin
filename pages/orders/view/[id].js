@@ -3,11 +3,23 @@ import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+const ORDER_STATUSES = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+
 const ViewOrder = () => {
   const router = useRouter();
   const { id } = router.query;
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [statusError, setStatusError] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -15,6 +27,7 @@ const ViewOrder = () => {
     fetchFromBackend(`orders/admin/${id}`)
       .then((res) => {
         setOrder(res.data);
+        setSelectedStatus(res.data.orderStatus);
         setLoading(false);
       })
       .catch((error) => {
@@ -22,6 +35,24 @@ const ViewOrder = () => {
         setLoading(false);
       });
   }, [id]);
+
+  const handleStatusUpdate = async () => {
+    if (selectedStatus === order.orderStatus) return;
+    setStatusUpdating(true);
+    setStatusError("");
+    try {
+      await fetchFromBackend(`orders/${id}/update-status`, {
+        method: "PUT",
+        body: { orderStatus: selectedStatus },
+      });
+      setOrder((prev) => ({ ...prev, orderStatus: selectedStatus }));
+    } catch (err) {
+      setStatusError(err.message || "Failed to update status");
+      setSelectedStatus(order.orderStatus);
+    } finally {
+      setStatusUpdating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -60,7 +91,30 @@ const ViewOrder = () => {
             </div>
             <div>
               <p className="text-gray-600">Order Status</p>
-              <p className="font-medium capitalize">{order.orderStatus}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="border rounded px-2 py-1 capitalize text-sm"
+                  disabled={statusUpdating}
+                >
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s} className="capitalize">
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleStatusUpdate}
+                  disabled={statusUpdating || selectedStatus === order.orderStatus}
+                  className="btn-default text-sm py-1 px-3 disabled:opacity-50"
+                >
+                  {statusUpdating ? "Saving..." : "Update"}
+                </button>
+              </div>
+              {statusError && (
+                <p className="text-red-500 text-sm mt-1">{statusError}</p>
+              )}
             </div>
             <div>
               <p className="text-gray-600">Payment Status</p>
