@@ -11,6 +11,7 @@ import {
   Store,
   LogOut,
   X,
+  BookOpen,
 } from "lucide-react";
 
 const Nav = ({ show, onClose }) => {
@@ -96,6 +97,14 @@ const Nav = ({ show, onClose }) => {
           >
             <Store className="w-5 h-5 shrink-0" />
             Sellers
+          </Link>
+          <Link
+            href="/blog/bloglist"
+            className={pathname.includes("/blog") ? activeLink : inactiveLink}
+            onClick={close}
+          >
+            <BookOpen className="w-5 h-5 shrink-0" />
+            Blogs
           </Link>
           <Link
             href="/settings"
