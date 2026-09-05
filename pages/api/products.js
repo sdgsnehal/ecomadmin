@@ -40,6 +40,8 @@ export default async function handler(req, res) {
     if (req.query?.id) {
       await Product.deleteOne({ _id: req.query.id });
       res.json(true);
+    } else {
+      res.status(400).json({ error: "Missing product id" });
     }
   }
 }

@@ -1,5 +1,5 @@
 import Layout from "@/components/layout";
-import axios from "axios";
+import { fetchFromBackend } from "@/lib/fetchfromBackend";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -11,7 +11,7 @@ const DeleteProductPage = () => {
     if (!id) {
       return;
     }
-    axios.get("/api/products?id=" + id).then((res) => {
+    fetchFromBackend("products/" + id).then((res) => {
       setProductInfo(res.data);
     });
   }, [id]);
@@ -19,13 +19,13 @@ const DeleteProductPage = () => {
     router.push("/products");
   }
   async function deleteProduct() {
-    await axios.delete("/api/products?id=" + id);
+    await fetchFromBackend("products/" + id, { method: "DELETE" });
     goBack();
   }
   return (
     <Layout>
       <h1 className="text-center">
-        Do you really want to delete &nbsp; {productInfo?.title}
+        Do you really want to delete &nbsp; {productInfo?.name}
       </h1>
       <div className="flex gap-2 justify-center">
         <button className="btn-red" onClick={deleteProduct}>
